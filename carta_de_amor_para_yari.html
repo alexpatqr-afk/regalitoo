@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Yari, Mi Amor ❤️</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Great Vibes & Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        goldAccent: '#D4AF37',
+                        softGold: '#F3E5AB',
+                        softPink: '#FFF0F3',
+                        blushPink: '#FFB3C1',
+                        deepRose: '#C9184A',
+                        darkRuby: '#590D22',
+                    },
+                    fontFamily: {
+                        script: ['Great Vibes', 'cursive'],
+                        sans: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Fondo con gradiente pastel romántico */
+        body {
+            background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 40%, #ffb3c1 70%, #f3e5ab 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Canvas de Corazones Flotantes */
+        #heartCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Cristal de fondo (Glassmorphic design) */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 12px 35px 0 rgba(201, 24, 74, 0.12);
+        }
+
+        /* Borde dorado de gala */
+        .gold-border {
+            border: 1px solid rgba(212, 175, 55, 0.4);
+        }
+
+        /* Sobre e interactividad de la carta */
+        .envelope-wrapper {
+            perspective: 1000px;
+        }
+        .envelope {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            background: #ffb3c1;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            box-shadow: 0 18px 40px rgba(89, 13, 34, 0.2);
+            cursor: pointer;
+            transition: transform 0.4s ease;
+        }
+        .envelope:hover {
+            transform: translateY(-8px);
+        }
+        .envelope .lid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 125px solid #ff8fa3;
+            transform-origin: top;
+            transition: transform 0.6s ease 0.2s, z-index 0.2s;
+            z-index: 3;
+        }
+        .envelope .pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid #ff8fa3;
+            border-right: 160px solid #ff758f;
+            border-bottom: 110px solid #ff4d6d;
+            border-top: 110px solid transparent;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            z-index: 2;
+        }
+        .envelope .letter {
+            position: absolute;
+            bottom: 10px;
+            left: 15px;
+            width: 290px;
+            height: 190px;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.6s ease 0.4s;
+            z-index: 1;
+            overflow: hidden;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        .envelope.open .lid {
+            transform: rotateX(180deg);
+            z-index: 0;
+        }
+        .envelope.open .letter {
+            transform: translateY(-130px);
+            z-index: 4;
+            height: auto;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        /* Tarjetas Flip de Razones */
+        .flip-card {
+            background-color: transparent;
+            perspective: 1000px;
+            height: 230px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        .flip-card:hover .flip-card-inner, .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Brillo sutil */
+        @keyframes subtlePulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(201, 24, 74, 0.25); }
+            50% { box-shadow: 0 0 35px rgba(201, 24, 74, 0.5); }
+        }
+        .pulse-glow {
+            animation: subtlePulse 3s infinite;
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-800 relative">
+
+    <!-- Canvas de corazones flotantes de fondo -->
+    <canvas id="heartCanvas"></canvas>
+
+    <!-- Header / Bienvenida -->
+    <header class="relative min-h-[85vh] flex flex-col items-center justify-center text-center p-6 z-10">
+        <div class="glass-card p-8 md:p-14 rounded-3xl max-w-3xl w-full mx-auto pulse-glow gold-border transition-all duration-500">
+            <span class="inline-block text-5xl mb-3 animate-bounce">👑</span>
+            <h1 class="font-script text-6xl md:text-8xl text-deepRose mb-3 drop-shadow-sm">Para Yari</h1>
+            <p class="text-lg md:text-2xl text-darkRuby italic font-light mb-6">"De todas las cosas hermosas en el mundo, tú eres mi favorita."</p>
+            
+            <div class="flex items-center justify-center gap-3 mb-6">
+                <div class="h-[1px] w-12 bg-goldAccent"></div>
+                <i class="fa-solid fa-heart text-deepRose text-sm"></i>
+                <div class="h-[1px] w-12 bg-goldAccent"></div>
+            </div>
+
+            <p class="text-gray-700 text-base md:text-lg leading-relaxed max-w-xl mx-auto mb-8 font-light">
+                Creé este espacio digital con todo mi amor especialmente para ti. Un rinconcito interactivo para recordarte lo infinitamente especial que eres en mi vida.
+            </p>
+            
+            <a href="#razones" class="inline-flex items-center gap-3 bg-gradient-to-r from-deepRose to-darkRuby hover:from-darkRuby hover:to-deepRose text-white font-medium px-8 py-4 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                <span>Descubrir Razones</span>
+                <i class="fa-solid fa-sparkles text-softGold"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Sección 1: Razones Por Las Que Te Amo (Tarjetas Interactivas) -->
+    <section id="razones" class="py-20 px-4 relative z-10 max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+            <span class="text-xs uppercase tracking-widest text-deepRose font-semibold">Toca cada tarjeta</span>
+            <h2 class="font-script text-5xl md:text-7xl text-deepRose mt-1 mb-2">Razones Por Las Que Te Amo</h2>
+            <div class="w-20 h-1 bg-gradient-to-r from-transparent via-goldAccent to-transparent mx-auto"></div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Card 1 -->
+            <div class="flip-card cursor-pointer" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front glass-card border border-pink-200">
+                        <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center mb-4 text-deepRose">
+                            <i class="fa-solid fa-face-smile-beam text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-darkRuby">Tu Sonrisa</h3>
+                        <p class="text-xs text-rose-500 mt-2 font-medium">Toca para descubrir</p>
+                    </div>
+                    <div class="flip-card-back bg-gradient-to-br from-deepRose to-darkRuby text-white shadow-2xl gold-border">
+                        <p class="text-sm font-light leading-relaxed">Tiene el poder mágico de iluminar absolutamente todo a tu alrededor y devolverme la paz en un instante.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="flip-card cursor-pointer" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front glass-card border border-pink-200">
+                        <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center mb-4 text-deepRose">
+                            <i class="fa-solid fa-heart-pulse text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-darkRuby">Tu Gran Corazón</h3>
+                        <p class="text-xs text-rose-500 mt-2 font-medium">Toca para descubrir</p>
+                    </div>
+                    <div class="flip-card-back bg-gradient-to-br from-deepRose to-darkRuby text-white shadow-2xl gold-border">
+                        <p class="text-sm font-light leading-relaxed">La dulzura, la empatía y la nobleza con la que tratas a quienes te rodean me enamoran cada día más.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="flip-card cursor-pointer" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front glass-card border border-pink-200">
+                        <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center mb-4 text-deepRose">
+                            <i class="fa-solid fa-eyes text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-darkRuby">Tu Mirada</h3>
+                        <p class="text-xs text-rose-500 mt-2 font-medium">Toca para descubrir</p>
+                    </div>
+                    <div class="flip-card-back bg-gradient-to-br from-deepRose to-darkRuby text-white shadow-2xl gold-border">
+                        <p class="text-sm font-light leading-relaxed">Porque en tus ojos encuentro tranquilidad, ternura y el reflejo del futuro que deseo construir a tu lado.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="flip-card cursor-pointer" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front glass-card border border-pink-200">
+                        <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center mb-4 text-deepRose">
+                            <i class="fa-solid fa-comments text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-darkRuby">Nuestras pláticas</h3>
+                        <p class="text-xs text-rose-500 mt-2 font-medium">Toca para descubrir</p>
+                    </div>
+                    <div class="flip-card-back bg-gradient-to-br from-deepRose to-darkRuby text-white shadow-2xl gold-border">
+                        <p class="text-sm font-light leading-relaxed">Desde las charlas más profundas hasta las risas tontas sin sentido, hablar contigo siempre es mi momento favorito.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="flip-card cursor-pointer" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front glass-card border border-pink-200">
+                        <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center mb-4 text-deepRose">
+                            <i class="fa-solid fa-hand-holding-heart text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-darkRuby">Tu Apoyo Incondicional</h3>
+                        <p class="text-xs text-rose-500 mt-2 font-medium">Toca para descubrir</p>
+                    </div>
+                    <div class="flip-card-back bg-gradient-to-br from-deepRose to-darkRuby text-white shadow-2xl gold-border">
+                        <p class="text-sm font-light leading-relaxed">Porque crees en mí, me impulsas a seguir adelante y celebras cada uno de mis logros como tuyo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="flip-card cursor-pointer" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front glass-card border border-pink-200">
+                        <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center mb-4 text-deepRose">
+                            <i class="fa-solid fa-star text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-darkRuby">Simplemente Tú</h3>
+                        <p class="text-xs text-rose-500 mt-2 font-medium">Toca para descubrir</p>
+                    </div>
+                    <div class="flip-card-back bg-gradient-to-br from-deepRose to-darkRuby text-white shadow-2xl gold-border">
+                        <p class="text-sm font-light leading-relaxed">Amo absolutamente todo de ti: tus gestos, tus detalles, tus virtudes y la maravillosa mujer en la que te conviertes cada día.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección 2: Carta de Amor dentro de Sobre Animado -->
+    <section class="py-20 px-4 relative z-10 max-w-4xl mx-auto text-center">
+        <div class="mb-12">
+            <span class="text-xs uppercase tracking-widest text-deepRose font-semibold">Toca el sobre para abrirlo</span>
+            <h2 class="font-script text-5xl md:text-7xl text-deepRose mt-1">Una Carta de Amor</h2>
+            <div class="w-20 h-1 bg-gradient-to-r from-transparent via-goldAccent to-transparent mx-auto mt-2"></div>
+        </div>
+
+        <div class="flex justify-center items-center">
+            <div class="envelope-wrapper">
+                <div class="envelope" id="envelope" onclick="toggleLetter()">
+                    <div class="lid"></div>
+                    <div class="pocket"></div>
+                    <div class="letter text-left text-xs md:text-sm text-gray-700 leading-relaxed">
+                        <p class="font-script text-2xl text-deepRose mb-2 font-bold">Mi hermosísima Yari,</p>
+                        <p class="mb-2">A veces las palabras habladas quedan cortas para tratar de expresar todo el amor que guardo por ti en mi corazón.</p>
+                        <p class="mb-2">Llegaste a mi vida como un regalo maravilloso, llenándola de color, calma, alegría e infinitas razones para sonreír.</p>
+                        <p class="mb-2">Gracias por ser mi refugio, mi mejor compañía y por hacerme sentir la persona más afortunada del mundo con solo estar a mi lado.</p>
+                        <p class="text-right font-script text-xl text-deepRose mt-4 font-bold">Por siempre tuyo ❤️</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección 3: Interactivas "¿Sientes lo mucho que te amo?" -->
+    <section class="py-20 px-4 relative z-10 max-w-3xl mx-auto text-center">
+        <div class="glass-card p-8 md:p-12 rounded-3xl shadow-2xl gold-border relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-pink-200/50 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-yellow-200/40 rounded-full blur-2xl"></div>
+
+            <i class="fa-solid fa-heart-circle-bolt text-5xl text-deepRose mb-4 animate-bounce"></i>
+            <h2 class="font-script text-5xl md:text-6xl text-darkRuby mb-3">¿Sientes lo mucho que te amo?</h2>
+            <p class="text-gray-600 mb-8 text-sm md:text-base font-light max-w-lg mx-auto">
+                Haz clic en el botón de abajo cuantas veces quieras para recibir una explosión de amor, abrazos virtuales y mensajitos especiales para ti.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button onclick="triggerLoveExplosion()" class="w-full sm:w-auto bg-gradient-to-r from-deepRose to-darkRuby hover:from-darkRuby hover:to-deepRose text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-heart text-pink-300"></i>
+                    <span>¡Explosión de Amor!</span>
+                </button>
+
+                <button onclick="showSpecialMessage()" class="w-full sm:w-auto bg-white hover:bg-pink-50 text-deepRose font-semibold px-8 py-4 rounded-full border-2 border-deepRose shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-envelope-open-text"></i>
+                    <span>Mensaje Cariñoso</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal para mensajes cariñosos -->
+    <div id="messageModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 p-4">
+        <div class="glass-card bg-white p-8 rounded-3xl max-w-md w-full text-center relative transform scale-90 transition-transform duration-300 gold-border shadow-2xl" id="modalContent">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-deepRose text-xl transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4 text-deepRose">
+                <i class="fa-solid fa-crown text-3xl"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-darkRuby mb-2">Un mensaje para Yari:</h3>
+            <p class="text-gray-700 italic text-lg my-6 font-light leading-relaxed" id="randomQuote">"Eres la casualidad más bonita que me ha sucedido nunca."</p>
+            <button onclick="closeModal()" class="bg-gradient-to-r from-deepRose to-darkRuby text-white px-8 py-3 rounded-full font-medium shadow-md hover:shadow-xl transition-all">
+                Te amo mucho 💕
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-xs text-darkRuby/70 relative z-10 font-light">
+        <p>Diseñado con amor infinito exclusivamente para mi princesa <span class="font-bold text-deepRose">Yari</span> ✨</p>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // 1. Abrir/Cerrar la Carta
+        function toggleLetter() {
+            const envelope = document.getElementById('envelope');
+            envelope.classList.toggle('open');
+        }
+
+        // 2. Explosión de corazones interactiva
+        function triggerLoveExplosion() {
+            var count = 250;
+            var defaults = {
+                origin: { y: 0.7 }
+            };
+
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio),
+                    shapes: ['circle'],
+                    colors: ['#C9184A', '#FFB3C1', '#FF758F', '#590D22', '#D4AF37']
+                }));
+            }
+
+            fire(0.25, { spread: 30, startVelocity: 60 });
+            fire(0.2, { spread: 70 });
+            fire(0.35, { spread: 110, decay: 0.91, scalar: 0.9 });
+            fire(0.1, { spread: 130, startVelocity: 30, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 130, startVelocity: 50 });
+        }
+
+        // 3. Colección de mensajes cariñosos
+        const quotes = [
+            "Eres la casualidad más bonita que ha llegado a mi vida, Yari.",
+            "Si me dieran a elegir de nuevo, te elegiría a ti mil veces más.",
+            "Me encanta la manera en que haces que todo sea más bonito.",
+            "Tu sonrisa es, sin duda alguna, mi paisaje favorito en el mundo.",
+            "Gracias por ser mi alegría diaria, mi paz y mi lugar seguro.",
+            "Cada minuto a tu lado vale más que mil años sin ti."
+        ];
+
+        function showSpecialMessage() {
+            const random = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('randomQuote').innerText = `"${random}"`;
+            
+            const modal = document.getElementById('messageModal');
+            const content = document.getElementById('modalContent');
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-90');
+            content.classList.add('scale-100');
+
+            triggerLoveExplosion();
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('messageModal');
+            const content = document.getElementById('modalContent');
+            
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-90');
+        }
+
+        // 4. Animación Canvas de Corazones Flotantes en Fondo
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        let hearts = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Heart {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.size = Math.random() * 14 + 6;
+                this.speedY = Math.random() * 1.2 + 0.4;
+                this.speedX = Math.sin(Math.random() * Math.PI) * 0.4;
+                this.opacity = Math.random() * 0.4 + 0.25;
+                this.color = `rgba(201, 24, 74, ${this.opacity})`;
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                if (this.y < -20) {
+                    this.y = canvas.height + 20;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.bezierCurveTo(-this.size / 2, -this.size / 2, -this.size, this.size / 3, 0, this.size);
+                ctx.bezierCurveTo(this.size, this.size / 3, this.size / 2, -this.size / 2, 0, 0);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function initHearts() {
+            hearts = [];
+            const heartCount = Math.floor(window.innerWidth / 30);
+            for (let i = 0; i < heartCount; i++) {
+                hearts.push(new Heart());
+            }
+        }
+
+        function animateHearts() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hearts.forEach(heart => {
+                heart.update();
+                heart.draw();
+            });
+            requestAnimationFrame(animateHearts);
+        }
+
+        window.onload = function() {
+            initHearts();
+            animateHearts();
+        };
+    </script>
+</body>
+</html>
